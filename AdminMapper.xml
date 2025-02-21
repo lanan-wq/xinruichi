@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.admin.AdminMapper">
+	<select id="login" parameterType="AdminUser" resultType="AdminUser">
+		select * from ausertable where aname=#{aname} and apwd=#{apwd}
+	</select>
+	<select id="selectAllOrder"  resultType="integer">
+		select count(*) from orderbasetable 
+	</select>
+	<!-- 分页查询 -->
+	<select id="selectOrderByPage"  resultType="map">
+		select obt.*, bt.bemail from orderbasetable obt, busertable bt where obt.busertable_id = bt.id limit #{startIndex}, #{pageSize} 
+	</select>
+	<!-- 订单销量按月统计（最近1年的） -->
+	<select id="selectOrderByMonth"  resultType="map">
+		select sum(amount) totalamount, date_format(orderdate,'%Y-%m') months
+		  from orderbasetable  where status = 1 and orderdate > date_sub(curdate(), interval 1 year)
+		 group by months order by months
+	</select>
+	<!-- 按类型统计（最近1年的） -->
+	<select id="selectOrderByType" resultType="map">
+		select sum(ob.amount) value, gy.typename name 
+		from orderbasetable ob, orderdetail od, goodstype gy, goodstable gt
+ 		where ob.status = 1 and ob.orderdate > date_sub(curdate(), interval 1 year) 
+		and od.orderbasetable_id=ob.id 
+		and gt.id=od.goodstable_id
+		and gt.goodstype_id = gy.id
+		group by gy.typename
+	</select>
+</mapper>

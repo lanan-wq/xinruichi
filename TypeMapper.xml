@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.admin.TypeMapper">
+	<insert id="addType" parameterType="GoodsType">
+		insert into goodstype values(null, #{typename})
+	</insert>
+	<select id="selectAllGoodsType" resultType="GoodsType">
+		select * from goodstype  
+	</select>
+	<select id="selectByPage" resultType="GoodsType">
+		select * from goodstype order by id desc limit #{startIndex}, #{pageSize}  
+	</select>
+	<select id="selectGoodsByTypeID" resultType="Goods" parameterType="GoodsType">
+		select * from goodstable where goodstype_id = #{id}
+	</select>
+	<delete id="delete" parameterType="GoodsType">
+		delete from goodstype where id = #{id}
+	</delete>
+	
+	<select id="selectGoodsTypeByID" parameterType="GoodsType" 
+	resultType="GoodsType">
+		select * from goodstype where id = #{id}
+	</select>
+	
+	<update id="updateType" parameterType="GoodsType">
+		update goodstype set typename = #{typename} where id = #{id} 
+	</update>
+</mapper>

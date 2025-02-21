@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.admin.GoodsMapper">
+	<insert id="add" parameterType="Goods">
+		insert into goodstable values(null, #{gname}, #{goprice}, #{grprice}, #{gstore}, #{gpicture}, #{goodstype_id}, #{isshow})
+	</insert>
+	
+	<select id="select" resultType="Goods">
+		select  gt.*, gp.typename from goodstable gt, goodstype gp 
+	    where gt.goodstype_id = gp.id order by gt.id desc
+	</select>
+	<!-- 分页查询 -->
+	<select id="selectByPage" resultType="Goods">
+		select gt.*, gp.typename from goodstable gt, goodstype gp 
+	    where gt.goodstype_id = gp.id order by gt.id desc limit #{startIndex}, #{pageSize}
+	</select>
+	
+	
+	<select id="selectCart" resultType="map" parameterType="int">
+		select * from carttable where goodstable_id = #{id}
+	</select>
+	
+	<select id="selectFocus" resultType="map" parameterType="int">
+		select * from focustable where goodstable_id = #{id}
+	</select>
+	
+	<select id="selectOrder" resultType="map" parameterType="int">
+		select * from orderdetail where goodstable_id = #{id}
+	</select>
+	
+	<delete id="delete" parameterType="int">
+		delete from goodstable where id = #{id}
+	</delete>
+	
+	<select id="selectAgoods" resultType="Goods" parameterType="int">
+		select gt.*, gp.typename from goodstable gt, goodstype gp 
+	    where gt.id = #{id} and gt.goodstype_id = gp.id 
+	</select>
+	
+	<update id="update" parameterType="Goods">
+		update 
+			goodstable 
+		set 
+			gname = #{gname},
+			goprice = #{goprice},
+			grprice = #{grprice},
+			gstore = #{gstore},
+			gpicture = #{gpicture},
+			goodstype_id = #{goodstype_id},
+			isshow = #{isshow}
+		where 
+			id=#{id} 
+	</update>
+</mapper>

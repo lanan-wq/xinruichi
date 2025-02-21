@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.before.CartMapper">
+	<select id="isCart" resultType="Cart" parameterType="Cart">
+		select * from carttable 
+		where busertable_id = #{busertable_id} and
+		goodstable_id = #{goodstable_id}
+	</select>
+	
+	<update id="updateCart" parameterType="Cart">
+		update carttable set 
+		shoppingnum = shoppingnum + #{shoppingnum} 
+	    where busertable_id = #{busertable_id} and
+		goodstable_id = #{goodstable_id}
+	</update>
+	
+	<insert id="insertCart" parameterType="Cart">
+		insert into carttable values(null,
+		 	#{busertable_id}, 
+		 	#{goodstable_id},
+		 	#{shoppingnum})
+	</insert>
+	
+	<select id="selectCart" parameterType="int" resultType="map">
+		select gt.id gid, gt.gname, gt.grprice, gt.gpicture, ct.id cid, 
+		ct.shoppingnum, gt.grprice*ct.shoppingnum smallsum
+		from carttable ct, goodstable gt
+		where ct.busertable_id = #{busertable_id} and
+		ct.goodstable_id = gt.id
+	</select>
+	
+	<delete id="deleteCart" parameterType="int">
+		delete from carttable where id = #{id}
+	</delete>
+
+	<delete id="deleteCollect" parameterType="int">
+		delete from focustable where goodstable_id = #{id}
+	</delete>
+
+	<delete id="clearCart" parameterType="int">
+		delete from carttable where busertable_id = #{busertable_id}
+	</delete>
+	<!-- 添加一个订单，成功后将主键值回填给id（Order类的属性）-->
+	<insert id="insertOrder" parameterType="Order"
+	 keyProperty="id" useGeneratedKeys="true">
+		insert into orderbasetable values(null, #{busertable_id}, #{amount}, #{status}, now())
+	</insert>
+	
+	<insert id="insertOrderDetail" parameterType="Order">
+		insert into
+		 orderdetail (orderbasetable_id, goodstable_id, shoppingnum)
+		select #{id}, goodstable_id, shoppingnum from carttable
+		 where busertable_id = #{busertable_id} 
+	</insert>
+	
+	<update id="updateStore" parameterType="int">
+		update goodstable gt
+		 inner join 
+		 (select goodstable_id,
+		  shoppingnum from 
+		  carttable where
+		   busertable_id = #{busertable_id}) ct
+		set 
+			gt.gstore =  gt.gstore - ct.shoppingnum
+		where gt.id = ct.goodstable_id
+	</update>
+	
+	<update id="pay" parameterType="int">
+		update orderbasetable set status = 1 where id = #{id}
+	</update>
+	
+	<select id="myOrder" parameterType="int" resultType="Order">
+		select id, amount, status, DATE_FORMAT(orderdate, '%Y-%m-%d %T') orderdate  from orderbasetable where busertable_id = #{busertable_id}
+	</select>
+	
+	<select id="orderDetail" parameterType="int" resultType="map">
+		select 
+			gt.id, gt.gpicture, gt.gname,
+			 gt.grprice, ot.shoppingnum
+		from 
+			goodstable gt, 
+			orderdetail ot 
+		where 
+			ot.goodstable_id = gt.id and
+			ot.orderbasetable_id = #{orderbasetable_id}
+	</select>
+	
+	<select id="myFocus" parameterType="int" resultType="map">
+		select 
+			gt.id, gt.gpicture, gt.gname,
+			 gt.grprice, gt.goprice
+		from 
+			goodstable gt, 
+			focustable ft 
+		where 
+			ft.goodstable_id = gt.id and
+			ft.busertable_id = #{busertable_id}
+	</select>
+	<update id="updatePWD" parameterType="Buser">
+		update busertable set bpwd = #{bpwd} where id = #{id}
+	</update>
+</mapper>

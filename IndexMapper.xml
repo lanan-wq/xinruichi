@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="dao.before.IndexMapper">
+	<!-- 查询广告商品 -->
+	<select id="selectAdviseGoods" resultType="Goods">
+		select * from goodstable where isshow = 1 order by id desc
+	</select>
+	<!-- 查询最新商品 -->
+	<select id="selectLastedGoods" resultType="Goods" parameterType="int">
+		select * from goodstable where isshow = 0 
+		<if test="id != 0">
+			and goodstype_id = #{id}
+		</if>
+		order by id desc
+	</select>
+	<!-- 搜索商品 -->
+	<select id="search" resultType="Goods" parameterType="string">
+		select * from  goodstable where isshow = 0 
+		 and gname like concat('%', #{mykey}, '%')
+		 order by id desc
+	</select>
+	
+	<select id="isFocus" resultType="map">
+		select * from focustable where
+		 goodstable_id = #{goodstable_id} 
+		 and busertable_id = #{busertable_id}
+	</select>
+	
+	<insert id="focus">
+		insert into focustable values(null, #{goodstable_id},
+		 #{busertable_id}, now())
+	</insert>
+	
+</mapper>
